@@ -15,6 +15,8 @@ class AddColumnDeviceToken extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('device_token')->nullable();
+            $table->string('mobile')->nullable();
+            $table->tinyInteger('mobile_verify')->default(0)->comment("0=>Not Verified, 1=>Verified");
         });
     }
 

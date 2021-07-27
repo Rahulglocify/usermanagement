@@ -181,4 +181,18 @@ class ProfileController extends Controller
         $response = curl_exec($ch);
         dd($response);
     }
+
+    public function mobileNoVerify()
+    {
+        if(Auth::user()->mobile_verify == 1){
+            return redirect()->back();
+        }
+       return view('mobile.mobileverify');
+    }
+
+    public function mobileNoUpdate(Request $request)
+    {
+        $update = User::where('id',Auth::id())->update(['mobile'=>$request->number,'mobile_verify'=>1]);
+        return $update;
+    }
 }

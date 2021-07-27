@@ -20,14 +20,21 @@ Route::get('/', function () {
 //     return view('dashboard');
 // })->middleware(['auth'])->name('dashboard');
 
+
+#Mobile Verify by firebase
+Route::get('mobile-verify', 'App\Http\Controllers\ProfileController@mobileNoVerify')->name('mobile-verify');
+
 Route::any('send-notification', 'App\Http\Controllers\ProfileController@sendNotification')->name('send-notification');
-Route::group(['middleware' => 'auth'], function(){
+Route::group(['middleware' => ['auth', 'CheckMobileNoVerified']], function () {
     Route::get('users', 'App\Http\Controllers\ProfileController@users')->name('users');
     Route::get('dashboard', 'App\Http\Controllers\ProfileController@dashboard')->name('dashboard');
     Route::post('dashboard', 'App\Http\Controllers\ProfileController@updateProfile')->name('update-profile');
     Route::get('google-autocomplete', 'App\Http\Controllers\ProfileController@googleautocomplete')->name('google-autocomplete');
 
-    #Token
+    #Mobile No update with status
+    Route::post('mobile-no-update', 'App\Http\Controllers\ProfileController@mobileNoUpdate')->name('mobile-no-update');
+
+    #Web Push Notification
     Route::post('save-token', 'App\Http\Controllers\ProfileController@saveToken')->name('save-token');
 
     #Calender
@@ -40,4 +47,4 @@ Route::group(['middleware' => 'auth'], function(){
     Route::post('add-gallery', 'App\Http\Controllers\ProfileController@postGallery')->name('post-gallery');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
