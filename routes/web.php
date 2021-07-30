@@ -37,6 +37,9 @@ Route::group(['middleware' => ['auth', 'CheckMobileNoVerified']], function () {
     #Web Push Notification
     Route::post('save-token', 'App\Http\Controllers\ProfileController@saveToken')->name('save-token');
 
+    #Social Share
+    Route::get('social-share', 'App\Http\Controllers\ProfileController@socialShare')->name('social-share');
+    
     #Calender
     Route::get('fullcalender', 'App\Http\Controllers\ProfileController@fullcalender')->name('fullcalender');
     Route::post('fullcalender', 'App\Http\Controllers\ProfileController@postCalender')->name('fullcalender');
@@ -45,6 +48,10 @@ Route::group(['middleware' => ['auth', 'CheckMobileNoVerified']], function () {
     Route::get('gallery', 'App\Http\Controllers\ProfileController@gallery')->name('gallery');
     Route::get('add-gallery', 'App\Http\Controllers\ProfileController@addGallery')->name('add-gallery');
     Route::post('add-gallery', 'App\Http\Controllers\ProfileController@postGallery')->name('post-gallery');
+
+    #webcam & camera
+    Route::get('webcam', 'App\Http\Controllers\ProfileController@webcam')->name('webcam');
+    Route::post('webcam', 'App\Http\Controllers\ProfileController@postWebcam')->name('post-webcam');
 });
 
 require __DIR__ . '/auth.php';

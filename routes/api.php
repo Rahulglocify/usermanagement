@@ -33,3 +33,6 @@ Route::post('product-delete', 'App\Http\Controllers\Api\ProductController@produc
 Route::get('product-details/{id}', 'App\Http\Controllers\Api\ProductController@productDetails')->name('product.details');
 Route::post('update-product', 'App\Http\Controllers\Api\ProductController@updateProduct')->name('update.product');
 Route::post('search', 'App\Http\Controllers\Api\ProductController@search')->name('search');
+
+#Newsletter
+Route::post('newsletter', 'App\Http\Controllers\Api\IndexController@newsletter')->name('newsletter');

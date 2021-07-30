@@ -4,9 +4,9 @@
       <!-- {{ __('Dashboard') }} --> Welcome {{Auth::user()->name}}
     </h2>
 
-  <button id="btn-nft-enable" onclick="initFirebaseMessagingRegistration()" class="btn btn-danger btn-xs btn-flat">Allow for Notification</button>
+    <button id="btn-nft-enable" onclick="initFirebaseMessagingRegistration()" class="btn btn-danger btn-xs btn-flat">Allow for Notification</button>
 
-        
+
   </x-slot>
 
   <div class="py-12">
@@ -32,9 +32,17 @@
             </div>
 
             <div class="form-group">
-              <input type="radio" id="male" name="gender" value="male" <?php if (isset(Auth::user()->userProfile->gender)) {if (Auth::user()->userProfile->gender == "male") {echo 'checked';}} ?>>
+              <input type="radio" id="male" name="gender" value="male" <?php if (isset(Auth::user()->userProfile->gender)) {
+                                                                          if (Auth::user()->userProfile->gender == "male") {
+                                                                            echo 'checked';
+                                                                          }
+                                                                        } ?>>
               <label for="html">Male</label><br>
-              <input type="radio" id="female" name="gender" value="female" <?php if (isset(Auth::user()->userProfile->female)) {if (Auth::user()->userProfile->gender == "female") {echo 'checked';}} ?>>
+              <input type="radio" id="female" name="gender" value="female" <?php if (isset(Auth::user()->userProfile->female)) {
+                                                                              if (Auth::user()->userProfile->gender == "female") {
+                                                                                echo 'checked';
+                                                                              }
+                                                                            } ?>>
               <label for="css">Female</label><br>
             </div>
 
@@ -109,69 +117,66 @@
 <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase.js"></script>
 
 <script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyCtKFUBVL6zhNirGbMHriqKmu3mmXjuYcs",
+    authDomain: "utility-braid-320711.firebaseapp.com",
+    databaseURL: "https://XXXX.firebaseio.com",
+    projectId: "utility-braid-320711",
+    storageBucket: "utility-braid-320711.appspot.com",
+    messagingSenderId: "559674762067",
+    appId: "1:559674762067:web:d9046214cfc76abb5337a6",
+    measurementId: "G-SG6F6KBW9V"
+  };
 
-  
 
-    var firebaseConfig = {
-        apiKey: "AIzaSyCtKFUBVL6zhNirGbMHriqKmu3mmXjuYcs",
-        authDomain: "utility-braid-320711.firebaseapp.com",
-        databaseURL: "https://XXXX.firebaseio.com",
-        projectId: "utility-braid-320711",
-        storageBucket: "utility-braid-320711.appspot.com",
-        messagingSenderId: "559674762067",
-        appId: "1:559674762067:web:d9046214cfc76abb5337a6",
-        measurementId: "G-SG6F6KBW9V"
+
+  firebase.initializeApp(firebaseConfig);
+  const messaging = firebase.messaging();
+
+  function initFirebaseMessagingRegistration() {
+    messaging
+      .requestPermission()
+      .then(function() {
+        return messaging.getToken()
+      })
+
+      .then(function(token) {
+        console.log(token);
+        $.ajaxSetup({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+        });
+
+        $.ajax({
+          url: '{{ route("save-token") }}',
+          type: 'POST',
+          data: {
+            token: token
+          },
+
+          dataType: 'JSON',
+
+          success: function(response) {
+            alert('Token saved successfully.');
+          },
+
+          error: function(err) {
+            console.log('User Chat Token Error' + err);
+          },
+        });
+
+      }).catch(function(err) {
+        console.log('User Chat Token Error' + err);
+      });
+  }
+
+  messaging.onMessage(function(payload) {
+    const noteTitle = payload.notification.title;
+    const noteOptions = {
+      body: payload.notification.body,
+      icon: payload.notification.icon,
     };
-
-      
-
-    firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging();
-
-    function initFirebaseMessagingRegistration() {
-            messaging
-            .requestPermission()
-            .then(function () {
-                return messaging.getToken()
-            })
-
-            .then(function(token) {
-                console.log(token);
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-
-                $.ajax({
-                    url: '{{ route("save-token") }}',
-                    type: 'POST',
-                    data: {
-                        token: token
-                    },
-
-                    dataType: 'JSON',
-
-                    success: function (response) {
-                        alert('Token saved successfully.');
-                    },
-
-                    error: function (err) {
-                        console.log('User Chat Token Error'+ err);
-                    },
-                });
-
-            }).catch(function (err) {
-                console.log('User Chat Token Error'+ err);
-            });
-     }  
-
-    messaging.onMessage(function(payload) {
-        const noteTitle = payload.notification.title;
-        const noteOptions = {
-            body: payload.notification.body,
-            icon: payload.notification.icon,
-        };
-        new Notification(noteTitle, noteOptions);
-    });
+    new Notification(noteTitle, noteOptions);
+  });
 </script>

@@ -107,9 +107,9 @@
       var number = $("#number").val();
 
       $.ajaxSetup({
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      }
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
       });
 
       $.ajax({
@@ -118,6 +118,10 @@
         data: {
           number: number
         },
+        dataType: "json",
+        success: function(data) {
+          data
+        }
       });
     }
   </script>

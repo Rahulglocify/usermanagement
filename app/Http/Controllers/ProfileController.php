@@ -10,6 +10,7 @@ use App\Models\Event;
 use App\Models\Images;
 use App\Events\NewUsers;
 use App\Http\Traits\ArtistTrait;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class ProfileController extends Controller
 {
@@ -20,7 +21,7 @@ class ProfileController extends Controller
         $ip = "112.196.2.226";
         $data = \Location::get($ip);
         // dd($data);
-        $userDetail = User::with('userProfile')->find(Auth::id());
+        $userDetail =  User::with('userProfile')->find(Auth::id());
         // dd($userDetail->userProfile->user_id);
         return view('dashboard');
     }
@@ -90,7 +91,7 @@ class ProfileController extends Controller
         if ($request->ajax()) {
             $data = Event::whereDate('start', '>=', $request->start)
                 ->whereDate('end',   '<=', $request->end)
-                ->where('user_id',Auth::id())
+                ->where('user_id', Auth::id())
                 ->get(['id', 'title', 'start', 'end']);
             return response()->json($data);
         }
@@ -135,7 +136,7 @@ class ProfileController extends Controller
 
     public function saveToken(Request $request)
     {
-        auth()->user()->update(['device_token'=>$request->token]);
+        auth()->user()->update(['device_token' => $request->token]);
         return response()->json(['token saved successfully.']);
     }
 
@@ -159,7 +160,7 @@ class ProfileController extends Controller
             "registration_ids" => $firebaseToken,
             "notification" => [
                 "title" => 'Test',
-                "body" => 'Test Message',  
+                "body" => 'Test Message',
             ]
         ];
 
@@ -184,15 +185,47 @@ class ProfileController extends Controller
 
     public function mobileNoVerify()
     {
-        if(Auth::user()->mobile_verify == 1){
+        if (Auth::user()->mobile_verify == 1) {
             return redirect()->back();
         }
-       return view('mobile.mobileverify');
+        return view('mobile.mobileverify');
     }
 
     public function mobileNoUpdate(Request $request)
     {
-        $update = User::where('id',Auth::id())->update(['mobile'=>$request->number,'mobile_verify'=>1]);
-        return $update;
+        $update = User::where('id', Auth::id())->update(['mobile' => $request->number, 'mobile_verify' => 1]);
+        return 1;
+    }
+
+    public function webcam()
+    {
+        return view('webcam.webcam');
+    }
+
+    public function postWebcam(Request $request)
+    {
+        $user = User::find(Auth::id());
+        $user->name = $request->name;
+
+        $myimgName = null;
+        if (request()->hasFile('image')) {
+            $myimg = $request->image;
+            $destinationPath = "uploads/user/";
+            $web_capture_part = explode(";base64,", $myimg);
+            $image_type_aux = explode("image/", $web_capture_part[0]);
+            $image_type = $image_type_aux[1];
+            $image_base64 = base64_decode($web_capture_part[1]);
+            $myimgName = uniqid() . '.png';
+            //$file = $destinationPath . $myimgName;
+            $myimg->move($destinationPath, $myimgName);
+        }
+        $data = [];
+        if ($myimgName) {
+            $data['profile_image'] = $myimgName;
+        }
+        
+        $userProfile = UserProfile::where('user_id', Auth::id())->update($data);
+
+        return redirect()->back()->with('success', 'Profile Updated successfully!');
     }
 }
